@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
-<title>福岡旅遊手帳 v15 (精緻透明版)</title>
+<title>福岡旅遊手帳</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
@@ -14,7 +14,7 @@
           paper: '#Fdfbf6',
           wine: '#8C433E',
           indigo: '#2B3A55',
-          ink: '#444444', // 稍微變淺一點的黑色，更柔和
+          ink: '#444444',
           'cat-transport': '#5D7D9A',
           'cat-shrine': '#C0554F',
           'cat-food': '#D99559',
@@ -24,11 +24,10 @@
           'cat-flex': '#888888',
         },
         boxShadow: {
-          card: '0 4px 30px rgba(0,0,0,0.1)', // 更柔和的陰影
+          card: '0 4px 30px rgba(0,0,0,0.1)',
           float: '0 10px 40px -10px rgba(43, 58, 85, 0.2)',
         },
         fontFamily: {
-            // 強制設定楷體
             sans: ['"KaiTi"', '"BiauKai"', '"DFKai-SB"', '"STKaiti"', '"Noto Serif TC"', 'serif'],
             serif: ['"KaiTi"', '"BiauKai"', '"DFKai-SB"', '"STKaiti"', '"Noto Serif TC"', 'serif']
         }
@@ -40,13 +39,13 @@
 <style>
   :root { --wine:#8C433E; --ink:#444444; }
   
-  /* 全域楷體設定，預設字重變細 */
+  /* 全域楷體設定 */
   body { 
     font-family: "KaiTi", "BiauKai", "DFKai-SB", "STKaiti", "Noto Serif TC", serif;
     color: var(--ink); 
     background: #fdfbf6; 
     min-height: 100vh;
-    font-weight: 400; /* 預設細體 */
+    font-weight: 400;
     -webkit-tap-highlight-color: transparent;
   }
   
@@ -54,7 +53,15 @@
 
   .app-container { max-width: 600px; margin: 0 auto; min-height: 100vh; position: relative; background-color: transparent; }
 
-  /* Cover */
+  /* 背景圖層 (固定) */
+  #app-bg-layer {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+    background-size: cover; background-position: center; filter: blur(20px) opacity(0.15);
+    transition: background-image 0.5s ease;
+    background-image: url('https://images.unsplash.com/photo-1549643276-fbc2cbd67406?q=80&w=1000&auto=format&fit=crop');
+  }
+
+  /* 封面 */
   #cover-page {
     position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
     z-index: 3000; background-color: #222;
@@ -63,7 +70,7 @@
   }
   #cover-page.hidden-cover { transform: translateY(-100%); }
 
-  /* Modal */
+  /* 彈窗與遮罩 */
   .overlay { position:fixed; inset:0; background:rgba(43,58,85,0.4); backdrop-filter: blur(5px); display:none; z-index:4000; transition: opacity 0.3s; }
   .overlay.show { display:block; }
   
@@ -77,7 +84,7 @@
   }
   .modal.show { transform:translate(-50%, 0); }
   
-  /* Sticky Header (Dynamic Transparency) */
+  /* 標題列 (動態透明) */
   .sticky-header { 
     position: sticky; top: 0; z-index: 100; 
     transition: all 0.4s ease;
@@ -85,17 +92,15 @@
     backdrop-filter: none;
     border-bottom: 1px solid transparent;
   }
-  /* 滑動後變成高強度毛玻璃，保持透明感 */
   .sticky-header.scrolled {
-    background: rgba(255, 255, 255, 0.5); /* 半透明白 */
-    backdrop-filter: blur(20px) saturate(180%); /* 強力毛玻璃 */
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(20px) saturate(180%);
     border-bottom: 1px solid rgba(255,255,255,0.2);
     box-shadow: 0 4px 30px rgba(0,0,0,0.1);
   }
   
-  /* Timeline */
+  /* 時間軸 */
   .tl-col { width: 52px; display: flex; flex-direction: column; align-items: center; padding-top: 8px; flex-shrink: 0; }
-  /* 字體變細：從 900 改為 600 */
   .tl-time { font-weight: 600; color: var(--wine); font-size: 15px; letter-spacing: 0.5px; }
   .tl-line { width: 0; border-left: 2px dashed rgba(140,67,62,0.3); flex: 1; margin: 8px 0; }
   .tl-dot { 
@@ -103,10 +108,10 @@
     background: #fff; border: 3px solid var(--wine); box-shadow: 0 0 0 3px rgba(140,67,62,0.1);
   }
 
-  /* Card (增加透明度與毛玻璃) */
+  /* 卡片 (毛玻璃) */
   .event-card { 
-    background: rgba(255,255,255,0.75); /* 卡片半透明 */
-    backdrop-filter: blur(15px) saturate(150%); /* 卡片毛玻璃 */
+    background: rgba(255,255,255,0.75); 
+    backdrop-filter: blur(15px) saturate(150%); 
     border-radius: 24px; padding: 20px; margin-bottom: 20px; 
     box-shadow: var(--card); border: 1px solid rgba(255,255,255,0.4);
     transition: transform 0.2s; user-select: none; position: relative;
@@ -115,7 +120,7 @@
   .sortable-ghost { opacity: 0.5; background: rgba(255,255,255,0.4); border: 2px dashed var(--wine); }
   .sortable-drag { cursor: grabbing; transform: scale(1.03) rotate(1deg); box-shadow: 0 20px 40px rgba(0,0,0,0.15); z-index: 999; }
 
-  /* UI Elements (字體微調) */
+  /* UI 元件 */
   .cat-tag { font-size: 11px; padding: 4px 10px; border-radius: 12px; color: #fff; font-weight: 600; display: inline-block; margin-right: 6px; letter-spacing: 1px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
   
   .input-field { width: 100%; padding: 14px; background: #F8F7F4; border: 1px solid #EBE5DC; border-radius: 16px; font-size: 16px; outline: none; transition: all 0.2s; }
@@ -123,7 +128,7 @@
   
   .label-text { font-size: 14px; font-weight: 600; color: #666; margin-bottom: 6px; display: block; letter-spacing: 1px; }
 
-  /* FAB */
+  /* FAB 按鈕 */
   .fab { 
     position: fixed; right: 24px; bottom: max(30px, env(safe-area-inset-bottom) + 30px);
     width: 64px; height: 64px; 
@@ -137,7 +142,7 @@
   }
   .fab:active { transform: scale(0.9); }
 
-  /* Buttons (字體微調) */
+  /* 通用按鈕 */
   .btn-wine { background: var(--wine); color: white; font-weight: 600; border-radius: 16px; box-shadow: 0 4px 15px rgba(140,67,62,0.3); transition: all 0.2s; letter-spacing: 2px; }
   .btn-wine:active { transform: scale(0.97); }
 
@@ -154,6 +159,8 @@
 </style>
 </head>
 <body class="bg-gray-100">
+
+<div id="app-bg-layer"></div>
 
 <div id="cover-page">
   <div class="absolute inset-0">
@@ -384,6 +391,7 @@ if(savedCover) applyCoverImage(savedCover);
 function applyCoverImage(src) {
     document.getElementById('coverImg').src = src;
     document.getElementById('appHeroImg').src = src;
+    document.getElementById('app-bg-layer').style.backgroundImage = `url('${src}')`;
 }
 
 document.getElementById('coverUpload').onchange = (e) => {
@@ -418,14 +426,9 @@ function initCover() {
   }, 1000);
 }
 
-// ==================== 3. Scroll Effect (透明度不再變化，只變顏色) ====================
+// ==================== 3. Scroll Effect ====================
 window.addEventListener('scroll', () => {
     const scrollY = window.scrollY;
-    // 移除 hero-layer 的透明度變化，保持背景圖顯示
-    // const heroLayer = document.getElementById('hero-layer');
-    // let opacity = 1 - (scrollY / 350); 
-    // if(opacity < 0) opacity = 0;
-    // heroLayer.style.opacity = opacity;
     
     const header = document.getElementById('main-header');
     const headerText = document.getElementById('headerTextContainer');
@@ -538,7 +541,6 @@ function render() {
     const imgHtml = evt.img ? `<img src="${evt.img}" class="w-full h-32 object-cover rounded-xl mt-3 border border-black/10">` : '';
     const mapHtml = evt.map ? `<a href="${evt.map}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] text-gray-500 underline ml-1 font-medium">地圖</a>` : '';
 
-    // 字體變細：標題用 font-semibold
     el.innerHTML = `
       <div class="tl-col"><div class="tl-time">${evt.time}</div><div class="tl-line"></div><div class="tl-dot"></div></div>
       <div class="flex-1">
